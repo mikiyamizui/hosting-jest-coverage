@@ -5,8 +5,7 @@ env:
   branch_dir: docs/coverage/${{ github.head_ref || github.ref_name }}
 
 jobs:
-  test:
-    name: test
+  main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

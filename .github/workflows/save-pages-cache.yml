@@ -2,8 +2,7 @@ on:
   workflow_call:
 
 jobs:
-  save-pages-cache:
-    name: save-pages-cache
+  main:
     runs-on: ubuntu-latest
     concurrency: save-pages-cache
     steps:
