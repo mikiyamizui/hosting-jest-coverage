@@ -4,96 +4,14 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-
-env:
-  branch_dir: docs/coverage/${{ github.head_ref || github.ref_name }}
-
 jobs:
   test:
-    name: test
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - name: Checkout branch
-        uses: actions/checkout@v3
-      - name: Setup node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: node
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        id: cache_node_modules
-        with:
-          path: "**/node_modules"
-          key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
-      - name: Install packages
-        run: npm ci
-        if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - name: Run jest
-        run: npx jest --colors --coverage --coverageDirectory .coverage
-      - name: Create coverage report directory
-        run: mkdir -p ${{ env.branch_dir }}
-      - name: Copy coverage report
-        run: cp -vRT .coverage/lcov-report ${{ env.branch_dir }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: gh-pages
-          path: docs
+    uses: ./.github/workflows/reusables/test.yml
 
   save-pages-cache:
-    name: save-pages-cache
     needs: [test]
-    runs-on: ubuntu-latest
-    concurrency: save-pages-cache
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - name: Restore github pages cache
-        uses: actions/cache/restore@v3
-        with:
-          path: docs
-          key: github-pages
-      - name: Remove coverage report if exists
-        run: rm -rf ${{ env.branch_dir }}
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: gh-pages
-          path: docs
-      - run: ls -R .
-      - name: Save github pages cache
-        uses: actions/cache/save@v3
-        if: always()
-        with:
-          path: docs
-          key: github-pages
+    uses: ./.github/workflows/reusables/save-pages-cache.yml
 
   deploy-pages:
-    name: deploy-pages
     needs: [save-pages-cache]
-    runs-on: ubuntu-latest
-    concurrency: deploy-pages
-    permissions:
-      pages: write
-      id-token: write
-    steps:
-      - name: Restore github pages cache
-        uses: actions/cache/restore@v3
-        with:
-          path: docs
-          key: github-pages
-      - run: ls -R .
-      - name: Upload github pages artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs
-      - name: Configure github pages
-        uses: actions/configure-pages@v3
-      - name: Deploy github pages
-        uses: actions/deploy-pages@v2
+    uses: ./.github/workflows/reusables/deploy-pages.yml

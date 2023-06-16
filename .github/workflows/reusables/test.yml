@@ -1,0 +1,39 @@
+on:
+  workflow_call:
+
+env:
+  branch_dir: docs/coverage/${{ github.head_ref || github.ref_name }}
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: node
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache_node_modules
+        with:
+          path: "**/node_modules"
+          key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
+      - name: Install packages
+        run: npm ci
+        if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
+      - name: Run jest
+        run: npx jest --colors --coverage --coverageDirectory .coverage
+      - name: Create coverage report directory
+        run: mkdir -p ${{ env.branch_dir }}
+      - name: Copy coverage report
+        run: cp -vRT .coverage/lcov-report ${{ env.branch_dir }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gh-pages
+          path: docs
