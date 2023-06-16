@@ -42,8 +42,10 @@ jobs:
         run: npx jest --colors --coverage --coverageDirectory .coverage
       - name: Remove coverage report if exists
         run: rm -rf ${{ env.coverage_report_dir }}
+      - name: Create coverage report directory
+        run: mkdir -p ${{ env.coverage_report_dir }}
       - name: Copy coverage report
-        run: cp -R .coverage/lcov-report ${{ env.coverage_report_dir }}
+        run: cp -RT .coverage/lcov-report ${{ env.coverage_report_dir }}
       - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
