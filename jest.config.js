@@ -1,6 +1,6 @@
 export default /** @type {import("jest").Config} */ ({
   testEnvironment: "node",
-  testMatch: ["src/**/*.test.{ts,tsx}"],
+  testRegex: ["\\.test\\.tsx?$"],
   transform: {
     "\\.tsx?$": "@swc/jest",
   },
