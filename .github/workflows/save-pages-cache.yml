@@ -14,7 +14,7 @@ jobs:
         with:
           name: gh-pages
           path: docs
-      - run: ls -R .
+      - run: ls -R docs
       - uses: actions/cache/save@v3
         if: always()
         with:
