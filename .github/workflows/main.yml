@@ -20,7 +20,7 @@ jobs:
         with:
           name: github-pages
         continue-on-error: true
-      - run: ls -R ./coverage
+      - run: ls -R .
       - uses: actions/setup-node@v3
         with:
           node-version: node
@@ -29,11 +29,11 @@ jobs:
         with:
           path: "**/node_modules"
           key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
-      - run: ls -R ./node_modules
+      - run: ls -R .
       - run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
       - run: npx jest --coverage --coverageDirectory coverage/${{ github.head_ref || github.ref_name }}
-      - run: ls -R ./coverage
+      - run: ls -R .
       - uses: actions/upload-artifact@v3
         with:
           name: github-pages
