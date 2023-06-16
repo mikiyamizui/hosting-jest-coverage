@@ -14,20 +14,8 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    env:
-      artifact_name: pages
-      github_pages_dir: _site
-      jest_coverage_dir: branches/${{ github.head_ref || github.ref_name }}/coverage
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        id: download-artifact
-        with:
-          name: ${{ env.artifact_name }}
-          path: ${{ env.github_pages_dir }}
-        continue-on-error: true
-      - run: mkdir -p ${{ env.github_pages_dir }}
-      - run: ls -R .
       - uses: actions/setup-node@v3
         with:
           node-version: node
@@ -38,13 +26,9 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - run: npx jest --coverage --coverageDirectory ${{ env.github_pages_dir }}/${{ env.jest_coverage_dir }} --colors
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.artifact_name }}
-          path: ${{ env.github_pages_dir }}
+      - run: npx jest --colors --coverage --coverageDirectory pages/branches/${{ github.head_ref || github.ref_name }}/coverage
       - uses: actions/upload-pages-artifact@v1
         with:
-          path: ${{ env.github_pages_dir }}
+          path: pages
       - uses: actions/configure-pages@v3
       - uses: actions/deploy-pages@v2
