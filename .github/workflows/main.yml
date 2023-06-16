@@ -45,7 +45,7 @@ jobs:
       - name: Create coverage report directory
         run: mkdir -p ${{ env.coverage_report_dir }}
       - name: Copy coverage report
-        run: cp -RT .coverage/lcov-report ${{ env.coverage_report_dir }}
+        run: cp -vRT .coverage/lcov-report ${{ env.coverage_report_dir }}
       - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
