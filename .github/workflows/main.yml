@@ -12,6 +12,7 @@ env:
 
 jobs:
   test:
+    name: test
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -45,6 +46,7 @@ jobs:
           path: docs
 
   save-pages-cache:
+    name: save-pages-cache
     needs: [test]
     runs-on: ubuntu-latest
     concurrency: save-pages-cache
@@ -73,18 +75,19 @@ jobs:
           key: github-pages
 
   deploy-pages:
-    needs: [test]
+    name: deploy-pages
+    needs: [save-pages-cache]
     runs-on: ubuntu-latest
     concurrency: deploy-pages
     permissions:
       pages: write
       id-token: write
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v3
+      - name: Restore github pages cache
+        uses: actions/cache/restore@v3
         with:
-          name: gh-pages
           path: docs
+          key: github-pages
       - run: find docs -type d -name coverage -print
       - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
