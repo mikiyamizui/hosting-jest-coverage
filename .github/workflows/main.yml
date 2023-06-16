@@ -15,6 +15,7 @@ jobs:
       pages: write
       id-token: write
     env:
+      artifact_name: github-pages
       github_pages_dir: _site
       jest_coverage_dir: branches/${{ github.head_ref || github.ref_name }}/coverage
     steps:
@@ -22,7 +23,7 @@ jobs:
       - uses: actions/download-artifact@v3
         id: download-artifact
         with:
-          name: github-pages
+          name: ${{ env.artifact_name }}
           path: ${{ env.github_pages_dir }}
         continue-on-error: true
       - run: mkdir -p ${{ env.github_pages_dir }}
@@ -38,6 +39,10 @@ jobs:
       - run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
       - run: npx jest --coverage --coverageDirectory ${{ env.github_pages_dir }}/${{ env.jest_coverage_dir }} --colors
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: ${{ env.github_pages_dir }}
       - uses: actions/upload-pages-artifact@v1
         with:
           path: ${{ env.github_pages_dir }}
