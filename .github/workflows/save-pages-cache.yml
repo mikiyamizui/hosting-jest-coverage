@@ -1,0 +1,21 @@
+on:
+  workflow_call:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    concurrency: save-pages-cache
+    steps:
+      - uses: actions/cache/restore@v3
+        with:
+          path: docs
+          key: github-pages
+      - uses: actions/download-artifact@v3
+        with:
+          name: gh-pages
+          path: docs
+      - uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: docs
+          key: github-pages
