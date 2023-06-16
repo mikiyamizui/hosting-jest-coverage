@@ -8,8 +8,8 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    # permissions:
+    #   contents: read
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3

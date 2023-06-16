@@ -4,14 +4,17 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   test:
     uses: ./.github/workflows/test.yml
-
   save-pages-cache:
     needs: [test]
     uses: ./.github/workflows/save-pages-cache.yml
-
   deploy-pages:
     needs: [save-pages-cache]
     uses: ./.github/workflows/deploy-pages.yml
