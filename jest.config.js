@@ -1,8 +1,8 @@
 export default /** @type {import("jest").Config} */ ({
   testEnvironment: "node",
-  testMatch: ["src/**/*.{ts,tsx}"],
+  testMatch: ["src/**/*.test.{ts,tsx}"],
   transform: {
-    "\\.test.tsx?$": "@swc/jest",
+    "\\.tsx?$": "@swc/jest",
   },
   collectCoverage: true,
   collectCoverageFrom: ["**/*.{ts,tsx}", "!**/node_modules/**"],
