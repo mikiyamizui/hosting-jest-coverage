@@ -17,6 +17,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: github-pages
+        continue-on-error: true
       - run: npx jest --coverage --coverageDirectory ${{ github.head_ref || github.ref_name }}
       - uses: actions/upload-artifact@v3
         with:
