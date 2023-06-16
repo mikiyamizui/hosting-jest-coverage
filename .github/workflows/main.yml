@@ -15,12 +15,11 @@ jobs:
       pages: write
       id-token: write
     env:
-      github_pages_dir: github_pages
-      coverage_report_dir: branches/${{ github.head_ref || github.ref_name }}/coverage
+      coverage_report_dir: docs/branches/${{ github.head_ref || github.ref_name }}/coverage
     steps:
       - name: Checkout branch ${{ github.head_ref || github.ref_name }}
         uses: actions/checkout@v3
-      - name: Setup Node.js
+      - name: Setup node.js
         uses: actions/setup-node@v3
         with:
           node-version: node
@@ -33,21 +32,23 @@ jobs:
       - name: Install packages
         run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - name: Cache coverage report
+      - name: Cache github pages
         uses: actions/cache@v3
         id: cache_github_pages
         with:
-          path: ${{ env.github_pages_dir }}
+          path: docs
           key: github-pages
-      - name: Delete previous coverage report if exists
-        run: rm -rf ${{ env.github_pages_dir }}/${{ env.coverage_report_dir }}
       - name: Run jest
-        run: npx jest --colors --coverage --coverageDirectory ${{ env.github_pages_dir }}/${{ env.coverage_report_dir }}
-      - name: Upload GitHub Pages Artifact
+        run: npx jest --colors --coverage --coverageDirectory .coverage
+      - name: Remove coverage report if exists
+        run: rm -rf ${{ env.coverage_report_dir }}
+      - name: Copy coverage report
+        run: cp -R .coverage/lcov-report ${{ env.coverage_report_dir }}
+      - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ${{ env.github_pages_dir }}
-      - name: Configure GitHub Pages
+          path: docs
+      - name: Configure github pages
         uses: actions/configure-pages@v3
-      - name: Deploy GitHub Pages
+      - name: Deploy github pages
         uses: actions/deploy-pages@v2
