@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "tsc": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest --coverage --coverageDirectory .coverage"
   },
   "devDependencies": {
     "@swc/jest": "^0.2.26",
