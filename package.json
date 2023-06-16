@@ -2,7 +2,11 @@
   "name": "github-pages",
   "version": "0.0.0",
   "private": true,
-  "scripts": {},
+  "type": "module",
+  "scripts": {
+    "tsc": "tsc --noEmit",
+    "test": "jest"
+  },
   "devDependencies": {
     "@swc/jest": "^0.2.26",
     "@types/jest": "^29.5.2",
