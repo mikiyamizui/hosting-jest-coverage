@@ -4,6 +4,6 @@ export default /** @type {import("jest").Config} */ ({
   transform: {
     "\\.tsx?$": "@swc/jest",
   },
-  collectCoverage: true,
+  collectCoverage: false,
   collectCoverageFrom: ["**/*.{ts,tsx}", "!**/node_modules/**"],
 });
