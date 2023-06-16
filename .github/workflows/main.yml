@@ -32,9 +32,8 @@ jobs:
       - name: Install packages
         run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - name: Cache github pages
-        uses: actions/cache@v3
-        id: cache_github_pages
+      - name: Restore github pages cache
+        uses: actions/cache/restore@v3
         with:
           path: docs
           key: github-pages
@@ -46,6 +45,12 @@ jobs:
         run: mkdir -p ${{ env.coverage_report_dir }}
       - name: Copy coverage report
         run: cp -vRT .coverage/lcov-report ${{ env.coverage_report_dir }}
+      - name: Save github pages cache
+        uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: docs
+          key: github-pages
       - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
