@@ -32,7 +32,6 @@ jobs:
       - name: Install packages
         run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - run: find docs -type d -name coverage -print
       - name: Run jest
         run: npx jest --colors --coverage --coverageDirectory .coverage
       - name: Create coverage report directory
@@ -65,7 +64,7 @@ jobs:
         with:
           name: gh-pages
           path: docs
-      - run: ls -R .
+      - run: find docs -type d -name coverage -print
       - name: Save github pages cache
         uses: actions/cache/save@v3
         if: always()
@@ -86,7 +85,7 @@ jobs:
         with:
           name: gh-pages
           path: docs
-      - run: ls -R .
+      - run: find docs -type d -name coverage -print
       - name: Upload github pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
