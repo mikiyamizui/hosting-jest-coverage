@@ -29,6 +29,7 @@ jobs:
       - run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
       - run: npx jest --coverage --coverageDirectory ${{ github.head_ref || github.ref_name }}
+      - run: ls -R ./coverage
       - uses: actions/upload-artifact@v3
         with:
           name: github-pages
