@@ -10,6 +10,7 @@ jobs:
         with:
           path: docs
           key: github-pages
+      - run: ls -R .
       - uses: actions/upload-pages-artifact@v1
         with:
           path: docs

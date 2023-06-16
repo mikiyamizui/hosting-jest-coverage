@@ -25,6 +25,7 @@ jobs:
         run: |
           mkdir -p ${{ env.branch_dir }}
           cp -vRT .coverage/lcov-report ${{ env.branch_dir }}
+      - run: ls -R docs
       - uses: actions/upload-artifact@v3
         with:
           name: gh-pages
