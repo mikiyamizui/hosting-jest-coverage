@@ -19,9 +19,12 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
         if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
-      - run: npx jest --colors --coverage --coverageDirectory .coverage
-      - run: mkdir -p ${{ env.branch_dir }}
-      - run: cp -vRT .coverage/lcov-report ${{ env.branch_dir }}
+      - name: Run jest
+        run: npx jest --colors --coverage --coverageDirectory .coverage
+      - name: Prepare artifact
+        run: |
+          mkdir -p ${{ env.branch_dir }}
+          cp -vRT .coverage/lcov-report ${{ env.branch_dir }}
       - uses: actions/upload-artifact@v3
         with:
           name: gh-pages
