@@ -36,6 +36,7 @@ jobs:
         with:
           path: docs
           key: github-pages
+      - run: ls -R docs
       - name: Run jest
         run: npx jest --colors --coverage --coverageDirectory .coverage
       - name: Remove coverage report if exists
