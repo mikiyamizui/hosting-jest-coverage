@@ -18,6 +18,16 @@ jobs:
         with:
           name: github-pages
         continue-on-error: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: node
+      - uses: actions/cache@v3
+        id: cache_node_modules
+        with:
+          path: "**/node_modules"
+          key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
+      - run: npm ci
+        if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
       - run: npx jest --coverage --coverageDirectory ${{ github.head_ref || github.ref_name }}
       - uses: actions/upload-artifact@v3
         with:
