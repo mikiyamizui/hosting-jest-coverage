@@ -1,29 +1,17 @@
-name: deploy-pages
-
 on:
   workflow_call:
 
-# permissions:
-#   pages: write
-#   id-token: write
-
 jobs:
   deploy-pages:
-    name: deploy-pages
     runs-on: ubuntu-latest
     concurrency: deploy-pages
     steps:
-      - name: Restore github pages cache
-        uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v3
         with:
           path: docs
           key: github-pages
-      - run: ls -R .
-      - name: Upload github pages artifact
-        uses: actions/upload-pages-artifact@v1
+      - uses: actions/upload-pages-artifact@v1
         with:
           path: docs
-      - name: Configure github pages
-        uses: actions/configure-pages@v3
-      - name: Deploy github pages
-        uses: actions/deploy-pages@v2
+      - uses: actions/configure-pages@v3
+      - uses: actions/deploy-pages@v2

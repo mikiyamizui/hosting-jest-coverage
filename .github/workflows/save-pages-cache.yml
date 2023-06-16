@@ -1,37 +1,21 @@
-name: save-pages-cache
-
 on:
   workflow_call:
-
-# env:
-#   branch_dir: docs/coverage/${{ github.head_ref || github.ref_name }}
 
 jobs:
   save-pages-cache:
     name: save-pages-cache
-    # needs: [test]
     runs-on: ubuntu-latest
     concurrency: save-pages-cache
-    # permissions:
-    #   contents: read
-    #   pages: write
-    #   id-token: write
     steps:
-      - name: Restore github pages cache
-        uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v3
         with:
           path: docs
           key: github-pages
-      # - name: Remove coverage report if exists
-      #   run: rm -rf ${{ env.branch_dir }}
-      - name: Download artifact
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v3
         with:
           name: gh-pages
           path: docs
-      - run: ls -R .
-      - name: Save github pages cache
-        uses: actions/cache/save@v3
+      - uses: actions/cache/save@v3
         if: always()
         with:
           path: docs
