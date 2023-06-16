@@ -17,9 +17,10 @@ jobs:
       pages: write
       id-token: write
     env:
+      branch_name: ${BRANCH_NAME}
       branch_dir: docs/coverage/${BRANCH_NAME}
     steps:
-      - name: Checkout branch ${BRANCH_NAME}
+      - name: Checkout branch ${{ env.branch_name }}
         uses: actions/checkout@v3
       - name: Setup node.js
         uses: actions/setup-node@v3
