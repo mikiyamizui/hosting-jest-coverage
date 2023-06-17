@@ -4,17 +4,95 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   test:
-    uses: ./.github/workflows/test.yml
-  save-pages-cache:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: node
+      - uses: actions/cache@v3
+        id: cache_node_modules
+        with:
+          path: "**/node_modules"
+          key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('**/package-lock.json') }}
+      - run: npm ci
+        if: ${{ steps.cache_node_modules.outputs.cache-hit != 'true' }}
+      - run: npx jest --colors --coverage --coverageDirectory .coverage
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: .coverage/lcov-report
+
+  update-coverage-report:
+    if: |
+      github.event_name == 'push' || (
+        github.event_name == 'pull_request' && (
+          github.event.action == 'opened' ||
+          github.event.action == 'synchronize'
+        )
+      )
     needs: [test]
-    uses: ./.github/workflows/save-pages-cache.yml
-  deploy-pages:
-    needs: [save-pages-cache]
-    uses: ./.github/workflows/deploy-pages.yml
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage
+          path: docs/coverage/${{ github.head_ref }}
+      - name: git config
+        run: |
+          git config --local user.name "${{ github.workflow }}"
+          git config --local user.email ""
+      - run: git add docs
+      - run: git commit -m "Update coverage report for ${{ github.head_ref }}"
+      - run: git push origin gh-pages
+
+  remove-coverage-report:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+      - name: Remove coverage report
+        run: rm -rf docs/coverage/${{ github.head_ref }}
+      - name: git config
+        run: |
+          git config --local user.name "${{ github.workflow }}"
+          git config --local user.email ""
+      - run: git add docs
+      - run: git commit -m "Remove coverage report for ${{ github.head_ref }}"
+      - run: git push origin gh-pages
+
+  add-pr-comment-of-coverage-report-url:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'opened'
+    needs: [update-coverage-report]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Create pull request comment
+        run: |
+          cat << EOF > comment
+          Coverage report has been updated.
+          https://${{ github.repository_owner }}.github.io/${{ github.repository }}/coverage/${{ github.head_ref }}
+
+      - run: cat ./comment
+      - name: Post pull request comment
+        run: gh pr comment -F ./comment "${{ github.event.pull_request.html_url }}"
