@@ -43,8 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -60,19 +58,12 @@ jobs:
       - run: git add docs
       - run: git commit -m "Update coverage report for ${{ env.branch_name }} branch"
       - run: git push origin gh-pages
-      - uses: actions/configure-pages@v3
-      - uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs
-      - uses: actions/deploy-pages@v2
 
   remove-coverage-report:
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -86,11 +77,6 @@ jobs:
       - run: git add docs
       - run: git commit -m "Remove coverage report for ${{ env.branch_name }} branch"
       - run: git push origin gh-pages
-      - uses: actions/configure-pages@v3
-      - uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs
-      - uses: actions/deploy-pages@v2
 
   add-pr-comment-of-coverage-report-url:
     if: |
