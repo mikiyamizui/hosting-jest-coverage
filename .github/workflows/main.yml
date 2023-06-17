@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+env:
+  branch_name: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -46,13 +49,13 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage
-          path: docs/coverage/${{ github.head_ref }}
+          path: docs/coverage/${{ env.branch_name }}
       - name: git config
         run: |
           git config --local user.name "${{ github.workflow }}"
           git config --local user.email ""
       - run: git add docs
-      - run: git commit -m "Update coverage report for ${{ github.head_ref }}"
+      - run: git commit -m "Update coverage report for ${{ env.branch_name }}"
       - run: git push origin gh-pages
 
   remove-coverage-report:
@@ -67,13 +70,13 @@ jobs:
         with:
           ref: gh-pages
       - name: Remove coverage report
-        run: rm -rf docs/coverage/${{ github.head_ref }}
+        run: rm -rf docs/coverage/${{ env.branch_name }}
       - name: git config
         run: |
           git config --local user.name "${{ github.workflow }}"
           git config --local user.email ""
       - run: git add docs
-      - run: git commit -m "Remove coverage report for ${{ github.head_ref }}"
+      - run: git commit -m "Remove coverage report for ${{ env.branch_name }}"
       - run: git push origin gh-pages
 
   add-pr-comment-of-coverage-report-url:
@@ -91,7 +94,7 @@ jobs:
         run: |
           cat << EOF > comment
           Coverage report has been updated.
-          https://${{ github.repository_owner }}.github.io/${{ github.repository }}/coverage/${{ github.head_ref }}
+          https://${{ github.repository_owner }}.github.io/${{ github.repository }}/coverage/${{ env.branch_name }}
 
       - run: cat ./comment
       - name: Post pull request comment
