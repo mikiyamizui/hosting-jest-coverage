@@ -67,9 +67,6 @@ jobs:
       - run: git push origin gh-pages
 
   remove-coverage-report:
-    # if: |
-    #   github.event_name == 'pull_request' &&
-    #   github.event.action == 'closed'
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     permissions:
@@ -102,7 +99,9 @@ jobs:
       - name: Create pull request comment
         run: |
           cat << EOF > comment
-          Coverage report has been updated.
+          ## Coverage report
+          Now deploying the coverage report to the following URL.
+          Please wait a moment.
           https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/coverage/${{ env.branch_name }}
 
       - run: cat ./comment
