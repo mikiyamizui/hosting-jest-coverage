@@ -1,6 +1,7 @@
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, closed, synchronize]
   push:
     branches: [main]
 
@@ -9,6 +10,13 @@ env:
 
 jobs:
   test:
+    if: |
+      github.event_name == 'push' || (
+        github.event_name == 'pull_request' && (
+          github.event.action == 'opened' ||
+          github.event.action == 'synchronize'
+        )
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,15 +63,14 @@ jobs:
           git config --local user.name "${{ github.workflow }}"
           git config --local user.email ""
       - run: git add docs
-      - run: git commit -m "Update coverage report for ${{ env.branch_name }}"
+      - run: git commit -m "Update coverage report for ${{ env.branch_name }} branch"
       - run: git push origin gh-pages
 
   remove-coverage-report:
-    if: |
-      github.event_name == 'pull_request' && (
-        github.event.action == 'closed' ||
-        github.event.pull_request.merged == true
-      )
+    # if: |
+    #   github.event_name == 'pull_request' &&
+    #   github.event.action == 'closed'
+    if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -78,7 +85,7 @@ jobs:
           git config --local user.name "${{ github.workflow }}"
           git config --local user.email ""
       - run: git add docs
-      - run: git commit -m "Remove coverage report for ${{ env.branch_name }}"
+      - run: git commit -m "Remove coverage report for ${{ env.branch_name }} branch"
       - run: git push origin gh-pages
 
   add-pr-comment-of-coverage-report-url:
